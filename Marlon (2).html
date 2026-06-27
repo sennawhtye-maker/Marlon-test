@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What are you looking at?</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ember:    #ff6a00;
+    --gold:     #ffb347;
+    --pale:     #f8e7d0;
+    --ash:      #1a0a00;
+    --char:     #0d0300;
+    --glow:     rgba(255,106,0,0.35);
+  }
+
+  body {
+    background: var(--char);
+    background-image:
+      radial-gradient(ellipse at 50% 0%, rgba(180,40,0,0.18) 0%, transparent 70%);
+    font-family: 'Crimson Pro', Georgia, serif;
+    color: var(--pale);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+
+  /* ── CARD ── */
+  .card {
+    width: 680px;
+    max-width: 100%;
+    background: linear-gradient(160deg, #180800 0%, #0d0300 100%);
+    border: 1px solid #5a2000;
+    box-shadow:
+      0 0 0 1px #ff6a0022,
+      0 0 40px rgba(255,106,0,0.25),
+      0 0 120px rgba(180,40,0,0.12);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ── BANNER ── */
+  .banner {
+    height: 200px;
+    background: url('https://as2.ftcdn.net/jpg/05/68/63/97/1000_F_568639760_ogUq2NDkZ6TuaNaYxS5HJoPYJ5hVTxRX.jpg') center/cover no-repeat;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(13,3,0,0.95) 100%);
+  }
+
+  /* ── HERO ROW ── */
+  .hero {
+    display: flex;
+    align-items: flex-end;
+    gap: 28px;
+    padding: 0 28px 0 28px;
+    margin-top: -140px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ── FIRE PORTRAIT ── */
+  .portrait-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 240px;
+    height: 300px;
+  }
+  .fire-canvas {
+    position: absolute;
+    top: -30px; left: -30px;
+    width: calc(100% + 60px);
+    height: calc(100% + 60px);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .portrait-frame {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 240px;
+    height: 290px;
+    border: 2px solid var(--ember);
+    box-shadow:
+      0 0 20px var(--glow),
+      inset 0 0 20px rgba(255,106,0,0.1);
+    overflow: hidden;
+    z-index: 2;
+  }
+  .portrait-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+  }
+  /* corner runes */
+  .portrait-frame::before,
+  .portrait-frame::after {
+    content: '✦';
+    position: absolute;
+    color: var(--ember);
+    font-size: 10px;
+    opacity: 0.8;
+    z-index: 3;
+  }
+  .portrait-frame::before { top: 4px; left: 4px; }
+  .portrait-frame::after  { bottom: 4px; right: 4px; }
+
+  /* ── NAME BLOCK ── */
+  .name-block {
+    flex: 1;
+    padding-bottom: 12px;
+  }
+  .eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--ember);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    opacity: 0.8;
+  }
+  .name {
+    font-family: 'Cinzel', serif;
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--gold);
+    text-shadow:
+      0 0 20px rgba(255,140,0,0.7),
+      0 0 60px rgba(255,80,0,0.3);
+    letter-spacing: 1px;
+  }
+  .title-tag {
+    margin-top: 8px;
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: #cc5500;
+    border: 1px solid #5a2000;
+    padding: 3px 10px;
+    text-transform: uppercase;
+  }
+
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    margin: 20px 28px;
+    background: linear-gradient(to right, transparent, var(--ember) 30%, var(--ember) 70%, transparent);
+    opacity: 0.4;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* ── TABS ── */
+  .tabs-wrap {
+    padding: 0 28px 28px;
+    position: relative;
+    z-index: 2;
+  }
+  .tab-buttons {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+  }
+  .tab-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #996633;
+    background: transparent;
+    border: 1px solid #3a1500;
+    border-bottom: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+    position: relative;
+    z-index: 1;
+  }
+  .tab-btn:hover { color: var(--gold); border-color: #884400; }
+  .tab-btn.active {
+    color: var(--gold);
+    background: rgba(255,106,0,0.08);
+    border-color: var(--ember);
+  }
+
+  .tab-body {
+    border: 1px solid #3a1500;
+    border-top: 1px solid var(--ember);
+    overflow: hidden;
+    position: relative;
+    min-height: 150px;
+  }
+
+  /* ── PANELS ── */
+  .panel {
+    display: none;
+    padding: 20px;
+    animation: slideIn 0.32s cubic-bezier(0.22,1,0.36,1);
+  }
+  .panel.active { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* panel content */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 24px;
+  }
+  .info-row { border-bottom: 1px solid rgba(255,106,0,0.1); padding-bottom: 10px; }
+  .info-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--ember);
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .info-value {
+    font-size: 15px;
+    color: var(--pale);
+    font-weight: 300;
+  }
+
+  .desc-text {
+    font-size: 15px;
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.8;
+    color: #e8cdb0;
+    border-left: 2px solid var(--ember);
+    padding-left: 14px;
+  }
+
+  .abilities-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .ability {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .ability-icon {
+    width: 28px; height: 28px; flex-shrink: 0;
+    border: 1px solid var(--ember);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: var(--gold);
+    background: rgba(255,106,0,0.08);
+  }
+  .ability-name {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    margin-bottom: 3px;
+  }
+  .ability-desc { font-size: 13px; color: #b89070; line-height: 1.5; }
+
+  /* ── PLAYER ── */
+  #yt-iframe {
+    position: absolute; width: 1px; height: 1px;
+    opacity: 0; pointer-events: none;
+  }
+
+  .player-bar {
+    margin: 0 28px 24px;
+    border: 1px solid #3a1500;
+    border-top: 1px solid var(--ember);
+    background: rgba(255,106,0,0.03);
+    position: relative;
+    z-index: 2;
+  }
+
+  .player-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px 6px;
+  }
+
+  .player-spin {
+    width: 34px; height: 34px; flex-shrink: 0;
+    border: 1px solid var(--ember);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    background: radial-gradient(circle, #1a0500 60%, #0d0300 100%);
+    box-shadow: 0 0 12px var(--glow);
+    animation: spin 8s linear infinite paused;
+    transition: box-shadow 0.3s;
+  }
+  .player-spin.playing {
+    animation-play-state: running;
+    box-shadow: 0 0 24px var(--glow), 0 0 50px rgba(255,80,0,0.15);
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  .player-meta { flex: 1; min-width: 0; }
+  .player-title {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .player-sub {
+    font-size: 10px; color: #664422;
+    font-family: 'Cinzel', serif; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 4px;
+  }
+
+  .player-controls {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .p-btn {
+    background: none; border: none; cursor: pointer;
+    color: #996633; font-size: 13px; padding: 4px;
+    transition: color 0.2s, transform 0.1s; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .p-btn:hover { color: var(--gold); }
+  .p-btn:active { transform: scale(0.88); }
+  .p-play {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--ember) !important;
+    background: rgba(255,106,0,0.1) !important;
+    color: var(--gold) !important;
+    font-size: 12px !important;
+    box-shadow: 0 0 12px var(--glow);
+  }
+  .p-play:hover { background: rgba(255,106,0,0.2) !important; }
+
+  .player-progress { padding: 0 14px 4px; }
+  .p-bar {
+    width: 100%; height: 2px;
+    background: #2a1000; border-radius: 2px;
+    cursor: pointer; position: relative;
+  }
+  .p-fill {
+    height: 100%;
+    background: linear-gradient(to right, #ff4400, var(--gold));
+    border-radius: 2px; width: 0%;
+    transition: width 0.2s linear; position: relative;
+  }
+  .p-fill::after {
+    content: '';
+    position: absolute; right: -3px; top: -2px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); box-shadow: 0 0 5px var(--ember);
+  }
+  .p-times {
+    display: flex; justify-content: space-between;
+    font-size: 9px; color: #553311;
+    font-family: 'Cinzel', serif; letter-spacing: 1px;
+    padding: 4px 14px 8px;
+  }
+
+  .player-vol {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 14px 10px;
+    border-top: 1px solid rgba(255,106,0,0.08);
+  }
+  .vol-lbl { font-size: 11px; color: #553311; }
+  input[type=range] {
+    -webkit-appearance: none; flex: 1;
+    height: 2px; background: #2a1000;
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ember); box-shadow: 0 0 5px var(--ember); cursor: pointer;
+  }
+
+  .p-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #3a1500; display: inline-block;
+    transition: background 0.3s, box-shadow 0.3s;
+    flex-shrink: 0;
+  }
+  .p-dot.live {
+    background: var(--ember);
+    box-shadow: 0 0 6px var(--ember);
+    animation: ppulse 1.2s ease-in-out infinite;
+  }
+  @keyframes ppulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.35; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="banner"></div>
+
+  <div class="hero">
+    <div class="portrait-wrap">
+      <canvas class="fire-canvas" id="fireCanvas"></canvas>
+      <div class="portrait-frame">
+        <img src="https://file.garden/ad_ApvVIV3ilAESK/Another%20one%20heretwo.jpg" alt="NAME HERE">
+      </div>
+    </div>
+    <div class="name-block">
+      <div class="eyebrow">The stalwart</div>
+      <div class="name">Jonathan<br>Abyss</div>
+      <div class="title-tag">✦ The Liar ✦</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="tabs-wrap">
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="profile">Profile</button>
+      <button class="tab-btn" data-tab="lore">Details</button>
+      <button class="tab-btn" data-tab="abilities">Abilities</button>
+    </div>
+    <div class="tab-body">
+
+      <div class="panel active" id="panel-profile">
+        <div class="info-grid">
+          <div class="info-row">
+            <div class="info-label">Age</div>
+            <div class="info-value">Can Drink and provide Drinks.</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Occupation</div>
+            <div class="info-value">Private Investigator</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Height</div>
+            <div class="info-value">Five foot nine inch</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Affiliation</div>
+            <div class="info-value">Those of the flock</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Title</div>
+            <div class="info-value">The Faithful</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Status</div>
+            <div class="info-value">Active</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-lore">
+        <p class="desc-text">
+          Keeping your faith in a place like this requires an iron will. And even moreso one to keep yourself under control when talking to people around here. People will call John many things. Some see him as just an mundane that can do nothing but manage to get himself into bad situations. Other see him as an asshole that can only manage to steal from others. What you come to know him as or by is up to you however. For at the end of the day, everyone's opinion is invalid to him. Because the only ones he has truly worried about are those up above. God has given his blessing. The angels sing his name to do what must be done to fight the dark. Even if he is seen as a villain? He'll do what he needs to do to help everyone.<br> The light shines in the darkness, and the darkness has not overcome it. John 1:5
+        </p>
+      </div>
+
+      <div class="panel" id="panel-abilities">
+        <ul class="abilities-list">
+          <li class="ability">
+            <div class="ability-icon">🔥</div>
+            <div>
+              <div class="ability-name">Zarathos</div>
+              <div class="ability-desc">The damned will be judged one way or another. It's not up to me to do the judging. I just have to send them up to God.</div>
+            </div>
+          </li>
+          <li class="ability">
+            <div class="ability-icon">🌟</div>
+            <div>
+              <div class="ability-name">Seraphic Armament</div>
+              <div class="ability-desc">My faith has long since called back to me, and has answered. I have no need for anything more than to show it off to you sinners.</div>
+            </div>
+          </li>
+          <li class="ability">
+            <div class="ability-icon">🐀</div>
+            <div>
+              <div class="ability-name">Thief</div>
+              <div class="ability-desc">What a rat of an ability. Be careful about what you show to strangers. One might even show they are better at it than what you appear to be.</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Hidden YT iframe -->
+  <iframe id="yt-iframe"
+    src="https://file.garden/ad_ApvVIV3ilAESK/Clair%20Obscur%20Expedition%2033%20(Original%20Soundtrack)%20130%20-%20We%20Lost.mp3"
+    allow="autoplay" frameborder="0"></iframe>
+
+  <!-- Player bar -->
+  <div class="player-bar">
+    <div class="player-top">
+      <div class="player-spin" id="pSpin">🔥</div>
+      <div class="player-meta">
+        <div class="player-title" id="pTitle">Loading…</div>
+        <div class="player-sub">
+          <span class="p-dot" id="pDot"></span>
+          <span id="pStatus">Ready</span>
+        </div>
+      </div>
+      <div class="player-controls">
+        <button class="p-btn" id="pRew" title="−10s">⏪</button>
+        <button class="p-btn p-play" id="pPlay">▶</button>
+        <button class="p-btn" id="pFwd" title="+10s">⏩</button>
+      </div>
+    </div>
+    <div class="player-progress">
+      <div class="p-bar" id="pBar"><div class="p-fill" id="pFill"></div></div>
+    </div>
+    <div class="p-times">
+      <span id="pTime">0:00</span>
+      <span id="pDur">0:00</span>
+    </div>
+    <div class="player-vol">
+      <span class="vol-lbl">🔈</span>
+      <input type="range" id="pVol" min="0" max="100" value="80">
+      <span class="vol-lbl">🔊</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ── TAB SWITCHING ── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ── FIRE CANVAS ── */
+const canvas = document.getElementById('fireCanvas');
+const ctx = canvas.getContext('2d');
+
+// Only reassign canvas dimensions when the size actually changes,
+// to avoid clearing the canvas (and restarting particle state) on every reflow.
+function resizeCanvas() {
+  const wrap = canvas.parentElement;
+  const w = wrap.offsetWidth  + 60;
+  const h = wrap.offsetHeight + 60;
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width  = w;
+    canvas.height = h;
+  }
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const particles = [];
+
+function randBetween(a, b) { return a + Math.random() * (b - a); }
+
+function spawnParticle() {
+  const w = canvas.width;
+  const h = canvas.height;
+  const edge = Math.floor(Math.random() * 4);
+  let x, y;
+  const pad = 30;
+  const fw = w - pad * 2;
+  const fh = h - pad * 2;
+
+  switch(edge) {
+    case 0: x = randBetween(pad, pad + fw); y = pad + fh;                   break; // bottom
+    case 1: x = pad;                         y = randBetween(pad, pad + fh); break; // left
+    case 2: x = pad + fw;                    y = randBetween(pad, pad + fh); break; // right
+    case 3: x = randBetween(pad, pad + fw); y = pad;                         break; // top
+  }
+
+  const angle = -Math.PI / 2 + randBetween(-0.9, 0.9);
+  const speed = randBetween(0.4, 1.4);
+
+  particles.push({
+    x, y,
+    vx: Math.cos(angle) * speed,
+    vy: Math.sin(angle) * speed - randBetween(0.3, 0.8),
+    life: 1,
+    decay: randBetween(0.012, 0.028),
+    size: randBetween(5, 16),
+    hue: randBetween(10, 45),
+  });
+}
+
+// Single loop — never spawned again, never cancelled.
+let rafId = null;
+function drawFire() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < 4; i++) spawnParticle();
+
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx + randBetween(-0.3, 0.3);
+    p.y += p.vy;
+    p.vy -= 0.015;
+    p.life -= p.decay;
+    if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+    const alpha = p.life;
+    const r = p.size * p.life;
+
+    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+    grad.addColorStop(0,   `hsla(${p.hue + 20}, 100%, 90%, ${alpha * 0.9})`);
+    grad.addColorStop(0.3, `hsla(${p.hue},      100%, 65%, ${alpha * 0.6})`);
+    grad.addColorStop(1,   `hsla(${p.hue - 10}, 100%, 30%, 0)`);
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  rafId = requestAnimationFrame(drawFire);
+}
+drawFire();
+
+/* ── YOUTUBE PLAYER ── */
+var ytTag = document.createElement('script');
+ytTag.src = "https://www.youtube.com/iframe_api";
+document.head.appendChild(ytTag);
+
+var ytPlayer, ytPlaying = false;
+
+window.onYouTubeIframeAPIReady = function() {
+  ytPlayer = new YT.Player('yt-iframe', {
+    videoId: 'pT3lOGaYZe0',
+    playerVars: { autoplay: 0, controls: 0, modestbranding: 1 },
+    events: { onReady: ytReady, onStateChange: ytState }
+  });
+};
+
+function ytReady(e) {
+  ytPlayer.setVolume(80);
+  const title = ytPlayer.getVideoData().title || 'Unknown Track';
+  document.getElementById('pTitle').textContent = title;
+  document.getElementById('pDur').textContent = fmtT(ytPlayer.getDuration());
+  setInterval(ytTick, 500);
+}
+
+function ytState(e) {
+  ytPlaying = e.data === YT.PlayerState.PLAYING;
+  document.getElementById('pPlay').textContent = ytPlaying ? '⏸' : '▶';
+  document.getElementById('pSpin').classList.toggle('playing', ytPlaying);
+  document.getElementById('pDot').classList.toggle('live', ytPlaying);
+  document.getElementById('pStatus').textContent = ytPlaying ? 'Now Playing' : 'Paused';
+}
+
+function ytTick() {
+  if (!ytPlayer || !ytPlayer.getCurrentTime) return;
+  const cur = ytPlayer.getCurrentTime();
+  const dur = ytPlayer.getDuration();
+  document.getElementById('pTime').textContent = fmtT(cur);
+  document.getElementById('pDur').textContent  = fmtT(dur);
+  document.getElementById('pFill').style.width = (dur ? (cur / dur * 100) : 0) + '%';
+}
+
+function fmtT(s) {
+  s = Math.floor(s || 0);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+document.getElementById('pPlay').addEventListener('click', () => {
+  if (!ytPlayer) return;
+  ytPlaying ? ytPlayer.pauseVideo() : ytPlayer.playVideo();
+});
+document.getElementById('pRew').addEventListener('click', () => {
+  if (ytPlayer) ytPlayer.seekTo(Math.max(0, ytPlayer.getCurrentTime() - 10), true);
+});
+document.getElementById('pFwd').addEventListener('click', () => {
+  if (ytPlayer) ytPlayer.seekTo(ytPlayer.getCurrentTime() + 10, true);
+});
+document.getElementById('pVol').addEventListener('input', function() {
+  if (ytPlayer) ytPlayer.setVolume(+this.value);
+});
+document.getElementById('pBar').addEventListener('click', function(e) {
+  if (!ytPlayer) return;
+  const rect = this.getBoundingClientRect();
+  ytPlayer.seekTo(((e.clientX - rect.left) / rect.width) * ytPlayer.getDuration(), true);
+});
+
+/* ── MOUSE EMBER TRAIL ── */
+const trailCanvas = document.createElement('canvas');
+trailCanvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;';
+document.body.appendChild(trailCanvas);
+const tc = trailCanvas.getContext('2d');
+
+function resizeTrail() {
+  trailCanvas.width  = window.innerWidth;
+  trailCanvas.height = window.innerHeight;
+}
+resizeTrail();
+window.addEventListener('resize', resizeTrail);
+
+const embers = [];
+let mouseX = -999, mouseY = -999, lastX = -999, lastY = -999;
+
+window.addEventListener('mousemove', function(ev) {
+  mouseX = ev.clientX;
+  mouseY = ev.clientY;
+});
+
+function spawnEmbers() {
+  const dx = mouseX - lastX, dy = mouseY - lastY;
+  const speed = Math.sqrt(dx * dx + dy * dy);
+  if (speed < 1) return;
+  const count = Math.min(Math.floor(speed * 0.4), 6);
+  for (let i = 0; i < count; i++) {
+    embers.push({
+      x: mouseX + randBetween(-4, 4),
+      y: mouseY + randBetween(-4, 4),
+      vx: randBetween(-1.2, 1.2),
+      vy: randBetween(-2.5, -0.8),
+      life: 1,
+      decay: randBetween(0.018, 0.038),
+      size: randBetween(3, 10),
+      hue: randBetween(8, 42),
+    });
+  }
+  lastX = mouseX; lastY = mouseY;
+}
+
+function drawTrail() {
+  tc.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+  spawnEmbers();
+  for (let i = embers.length - 1; i >= 0; i--) {
+    const p = embers[i];
+    p.x  += p.vx + randBetween(-0.2, 0.2);
+    p.y  += p.vy;
+    p.vy -= 0.06;
+    p.vx *= 0.96;
+    p.life -= p.decay;
+    if (p.life <= 0) { embers.splice(i, 1); continue; }
+    const r = p.size * p.life;
+    const a = p.life;
+    const g = tc.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+    g.addColorStop(0,   `hsla(${p.hue + 20}, 100%, 95%, ${a})`);
+    g.addColorStop(0.4, `hsla(${p.hue},      100%, 60%, ${a * 0.7})`);
+    g.addColorStop(1,   `hsla(${p.hue - 10}, 100%, 30%, 0)`);
+    tc.beginPath();
+    tc.arc(p.x, p.y, r, 0, Math.PI * 2);
+    tc.fillStyle = g;
+    tc.fill();
+  }
+  requestAnimationFrame(drawTrail);
+}
+drawTrail();
+</script>
+</body>
+</html>
